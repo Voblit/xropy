@@ -9,16 +9,7 @@
 </head>
 <body>
 
-<script type="module">
-  import { ScramjetClient, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@petezah-games/scramjet@2.0.3-petezah-alpha/+esm';
 
-  // Instantiate the client using default settings
-  const client = new ScramjetClient(defaultConfig);
-
-  // Encode a URL for proxying
-  const proxiedUrl = client.rewriteUrl('https://example.com');
-  console.log('Encoded target URL:', proxiedUrl);
-</script>
   <script type="module">
   if ('serviceWorker' in navigator) {
     try {
