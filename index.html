@@ -1,29 +1,161 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scramjet Module Setup</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Scramjet</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        form {
+            height: 50px;
+            display: flex;
+            gap: 5px;
+        }
+
+        input {
+            flex: 1;
+        }
+
+        iframe {
+            width: 100%;
+            height: calc(100% - 50px);
+            border: 0;
+        }
+    </style>
 </head>
+
 <body>
 
+    <form id="form">
+        <input
+            id="url"
+            placeholder="https://example.com"
+            autocomplete="off"
+        >
 
-  <script type="module">
-  if ('serviceWorker' in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register('./sw.js', {
-        type: 'module',
-        scope: '/'
-      });
-      console.log('Scramjet Service Worker active at scope:', registration.scope);
-    } catch (err) {
-      console.error('Service Worker registration failed:', err);
-    }
-  }
-</script>
+        <button type="submit">Go</button>
+    </form>
+
+    <iframe id="frame"></iframe>
+
+
+    <script type="module">
+
+        import { Controller } from "https://esm.run/@petezah-games/scramjet-controller";
+
+        import EpoxyClient from "https://esm.run/@mercuryworkshop/epoxy-transport";
+
+
+        const registration =
+            await navigator.serviceWorker.register(
+                "/sw.js",
+                {
+                    type: "module",
+                    scope: "/"
+                }
+            );
+
+
+        await navigator.serviceWorker.ready;
+
+
+        if (!navigator.serviceWorker.controller) {
+
+            await new Promise(resolve => {
+
+                navigator.serviceWorker.addEventListener(
+                    "controllerchange",
+                    resolve,
+                    { once: true }
+                );
+
+            });
+
+        }
+
+
+        const serviceworker =
+            navigator.serviceWorker.controller ||
+            registration.active;
+
+
+        const transport = new EpoxyClient({
+
+            wisp: "/wisp/"
+
+        });
+
+
+        const controller = new Controller({
+
+            serviceworker,
+
+            transport,
+
+            config: {
+
+                scramjetPath: "/scramjet.js",
+
+                injectPath:
+                    "https://esm.run/@petezah-games/scramjet-controller/inject",
+
+                wasmPath:
+                    "/scramjet.wasm"
+
+            }
+
+        });
+
+
+        await controller.wait();
+
+
+        const iframe =
+            document.querySelector("#frame");
+
+
+        const frame =
+            controller.createFrame(iframe);
+
+
+        document
+            .querySelector("#form")
+            .addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+                    let url =
+                        document
+                            .querySelector("#url")
+                            .value
+                            .trim();
+
+
+                    if (
+                        !/^https?:\/\//i.test(url)
+                    ) {
+
+                        url =
+                            "https://" + url;
+
+                    }
+
+
+                    frame.go(url);
+
+                }
+            );
+
+    </script>
 
 </body>
 </html>
-
