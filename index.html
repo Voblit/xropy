@@ -10,9 +10,27 @@
 <body>
 
 <script type="module">
-  import * as scramjet from 'https://cdn.jsdelivr.net/npm/@petezah-games/scramjet@2.0.3-petezah-alpha/+esm';
+  import { ScramjetClient, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@petezah-games/scramjet@2.0.3-petezah-alpha/+esm';
 
-  console.log('Scramjet module exports:', scramjet);
+  // Instantiate the client using default settings
+  const client = new ScramjetClient(defaultConfig);
+
+  // Encode a URL for proxying
+  const proxiedUrl = client.rewriteUrl('https://example.com');
+  console.log('Encoded target URL:', proxiedUrl);
+</script>
+  <script type="module">
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('./sw.js', {
+        type: 'module',
+        scope: '/'
+      });
+      console.log('Scramjet Service Worker active at scope:', registration.scope);
+    } catch (err) {
+      console.error('Service Worker registration failed:', err);
+    }
+  }
 </script>
 
 </body>
